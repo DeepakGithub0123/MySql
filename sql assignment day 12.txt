@@ -1,0 +1,51 @@
+1)
+
+
+SELECT YEAR(orderDate) AS `YEAR`,monthname(orderDate) AS MONTH,
+COUNT(orderNumber) AS `TOTAL ORDERS`,
+concat(Round((COUNT(orderNumber)/(LAG(COUNT(orderNumber)) OVER(ORDER BY YEAR(orderDate),month(month) )))*100-100,0),'%') AS `% YoY Change`
+FROM ORDERS
+GROUP BY `YEAR`,month 
+ORDER BY  `YEAR`,month(month) ;
+
+
+2)
+
+
+CREATE TABLE emp_udf (
+    Emp_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(255),
+    DOB DATE
+);
+
+INSERT INTO emp_udf (Name, DOB)
+VALUES 
+    ("Piyush", "1990-03-30"),
+    ("Aman", "1992-08-15"),
+    ("Meena", "1998-07-28"),
+    ("Ketan", "2000-11-21"),
+    ("Sanjay", "1995-05-21");
+store procedure:
+
+create definer=`root`@`localhost` function `calculate_age`(dob date) returns varchar(50) charset latin1
+    deterministic
+begin
+    declare years int;
+    declare months int;
+    declare age varchar(50);
+
+    set years = timestampdiff(year, dob, curdate());
+    set months = timestampdiff(month, dob, curdate()) - (years * 12);
+    
+    set age = concat(years, ' years ', months, ' months');
+    
+    return age;
+end
+
+SQL Command:
+SELECT Emp_ID, Name, DOB, calculate_age(DOB) AS Age
+FROM emp_udf;
+
+
+
+

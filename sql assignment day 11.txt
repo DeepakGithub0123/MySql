@@ -1,0 +1,43 @@
+1)
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetCustomerLevel`(IN input_customerNumber INT)
+BEGIN
+    DECLARE customer_level VARCHAR(50);
+    
+    SELECT
+        CASE
+            WHEN creditLimit > 100000 THEN 'Platinum'
+            WHEN creditLimit BETWEEN 25000 AND 100000 THEN 'Gold'
+            WHEN creditLimit < 25000 THEN 'Silver'
+            ELSE 'Unknown'
+        END INTO customer_level
+    FROM Customers
+    WHERE customerNumber = input_customerNumber;
+    
+    SELECT customer_level AS CustomerLevel;
+END
+
+SQL Command:
+CALL GetCustomerLevel(103); -- Replace 103 with the desired customer number
+
+
+
+2)
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `get_country_payments`(p_year int, p_country varchar(50))
+BEGIN
+select year(paymentdate) as Paymentyear, country as customercountry, concat(format(sum(amount)/ 1000,0), 'K') As TotalAmount from payments
+join
+customers on 
+payments.customernumber = customers.customernumber
+where
+year(paymentdate) = p_year and country = p_country
+group by paymentyear, customercountry;
+END
+
+
+
+
+
+
+

@@ -1,0 +1,11 @@
+mysql> select year(orderdate) as 'year' , concat(count(orderNumber),'(',round(count(orderNumber)*100/(select count(order
+Number)from orderdetails)),'%)') as 'values' from orderdetails inner join orders using (orderNumber) group by Year order
+ by count(orderNumber) desc;
++------+-----------+
+| year | values    |
++------+-----------+
+| 2004 | 1421(47%) |
+| 2003 | 1052(35%) |
+| 2005 | 523(17%)  |
++------+-----------+
+3 rows in set (0.02 sec)

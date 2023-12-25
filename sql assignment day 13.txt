@@ -1,0 +1,77 @@
+SELECT customerNumber, customerName
+FROM Customers
+WHERE customerNumber NOT IN (SELECT customerNumber FROM Orders);
+
+2)
+
+
+-- Create a temporary table to store the results of the left outer join
+CREATE TEMPORARY TABLE LeftJoinResult AS
+SELECT
+    c.customerNumber,
+    c.customerName,
+    COUNT(o.orderNumber) AS OrderCount
+FROM
+    Customers c
+LEFT JOIN
+    Orders o ON c.customerNumber = o.customerNumber
+GROUP BY
+    c.customerNumber, c.customerName;
+
+-- Create a temporary table to store the results of the right outer join
+CREATE TEMPORARY TABLE RightJoinResult AS
+SELECT
+    o.customerNumber,
+    c.customerName,
+    COUNT(o.orderNumber) AS OrderCount
+FROM
+    Customers c
+RIGHT JOIN
+    Orders o ON c.customerNumber = o.customerNumber
+GROUP BY
+    o.customerNumber, c.customerName;
+
+-- Combine the results of left and right outer joins using UNION
+SELECT * FROM LeftJoinResult
+UNION
+SELECT * FROM RightJoinResult;
+
+
+3)
+
+select * from orderdetails;
+SELECT
+    OrderNumber,
+    Quantityordered AS SecondHighestQuantity
+FROM (
+    SELECT
+        OrderNumber,
+        Quantityordered,
+        ROW_NUMBER() OVER (PARTITION BY OrderNumber ORDER BY Quantityordered DESC) AS rn
+    FROM Orderdetails
+) AS RankedData
+WHERE rn = 2;
+
+
+4)
+
+
+select
+    max(productcount) as max,
+    min(productcount) as min
+from (
+    select
+        ordernumber,
+        count(*) as productcount
+    from orderdetails
+    group by ordernumber
+) as counts;
+
+
+5)
+
+SELECT ProductLine, COUNT(*) AS Count
+FROM Products
+WHERE BuyPrice > (SELECT AVG(BuyPrice) FROM Products)
+GROUP BY ProductLine;
+
